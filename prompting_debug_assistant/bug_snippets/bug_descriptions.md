@@ -13,7 +13,7 @@
 **Issue Type**: Logical error.  
 **Notes**: Returns a float instead of a vector.
 
-## Bug 3 – bug4.m
+## Bug 4 – bug4.m
 **Intended Behavior**: calculates the scattering of a particle at multiple wavelengths in parallel, with a live updating progress bar
 **Issue Type**: Runtime exception.
 **Notes**: After completing several calculations an exception is thrown at line 45 involving the multiWaitBar.
