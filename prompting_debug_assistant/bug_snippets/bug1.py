@@ -9,6 +9,5 @@ def palindrome(word):
         else:
             print(f"{word[i]} ✅ {reverse[i]}")
 
-
 if __name__ == '__main__':
     palindrome("correct")

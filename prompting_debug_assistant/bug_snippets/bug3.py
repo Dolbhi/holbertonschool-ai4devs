@@ -7,4 +7,7 @@ def rotate(vec, rads):
     return r @ vec
 
 if __name__ == '__main__':
+    print(rotate(np.array([0, 1]), np.pi/2))
     print(rotate(np.array([1, 0]), np.pi/2))
+    print(rotate(np.array([1, 0]), np.pi/4))
+    print(rotate(np.array([1, 0]), np.pi))

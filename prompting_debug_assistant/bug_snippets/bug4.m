@@ -1,11 +1,4 @@
 function [enei, ext, sca] = get_spectra(p, pol, par)
-    % generates a truncated cube
-    %
-    % Usage :
-    %   [enei, ext, sca] = get_spectra(p)
-    % Input
-    %   p : Cell array of particle boundaries
-
     %%  initialization
     op = bemoptions( 'sim', 'ret', 'interp', 'curv' );
     
