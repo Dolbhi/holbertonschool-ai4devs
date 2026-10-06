@@ -1,7 +1,7 @@
 ## Bug 1 – bug1.py
-**Intended Behavior**: Returns the given list with elements in reverse order.  
+**Intended Behavior**: Checks if a word is a palindrome, if not print all letters and whether they match their corresponding reversed letter.  
 **Issue Type**: Off-by-one error.  
-**Notes**: The function fails to include the first term of the input.  
+**Notes**: The function fails to include the last term of the input when listing matches.  
 
 ## Bug 2 – bug2.rs
 **Intended Behavior**: give_homes adds a new place for each person in the world.  
