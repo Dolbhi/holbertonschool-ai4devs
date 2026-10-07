@@ -1,5 +1,5 @@
 ## Bug 1 – bug1.py
-**Intended Behavior**: Checks if a word is a palindrome, if not print all letters and whether they match their corresponding reversed letter.  
+**Intended Behavior**: Given a string checks if it is a palindrome, if not print all letters and whether they match their corresponding reversed letter.  
 **Issue Type**: Off-by-one error.  
 **Notes**: The function fails to include the last term of the input when listing matches.  
 
@@ -14,6 +14,6 @@
 **Notes**: Only returns the first component of the resulting vector.
 
 ## Bug 4 – bug4.m
-**Intended Behavior**: Using MNPBEM17 MATLAB package, given a particle and polarisation direction, returns 3 arrays containing the excitation wavelengths, and calculated scattering and extinction cross-section. During scattering and extinction calculation a progress bar should show the remaining wavelengths left to calculate.
+**Intended Behavior**: Given a particle and polarisation direction, returns 3 arrays containing the excitation wavelengths, and calculated scattering and extinction cross-section. During scattering and extinction calculation a progress bar should show the remaining wavelengths left to calculate.
 **Issue Type**: Runtime exception.
 **Notes**: After completing several calculations an exception is thrown at line 45 involving the multiWaitBar.
