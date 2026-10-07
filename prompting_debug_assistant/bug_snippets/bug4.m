@@ -1,4 +1,4 @@
-function [enei, ext, sca] = get_spectra(p, pol, par)
+function [enei, ext, sca] = get_spectra(p, pol)
     %%  initialization
     op = bemoptions( 'sim', 'ret', 'interp', 'curv' );
     
