@@ -1,18 +1,8 @@
 # Reflection on AI-assisted Debugging
+Overall Claude was able to resolve the bugs in all snippets with minimal input. For most cases I just copied and pasted the code snippet whole and asked it to resolve the bug without even specifying what the bug was. The first 3 bugs were fairly straight forward and were common bugs likely with a lot of training data. Claude not only correctly identified what would go wrong, but would also gave an explanation of the cause and offered a correct solution. I was already familiar with these bugs so I could immediately verify their correctness and knew it was trustworthy.
 
-Which bugs were easiest and hardest for the AI to solve.
-The trust level in the AI’s suggestions.
-Where human intuition was required.
-Key insights on AI’s role in real-world debugging.
+For bug 3, Claude thought a type error would occur and the buggy code would not even run, even though it did run without error. It correctly decerned that `(s, c)` was unintentionally passed to `dtype` but was unable to further deduce that it could still be accepted. This is a reasonable mistake to make even for humans due to the lack of static typing in python and numpy's extensive use of function overloading. It appears Claude was either unable or "unwilling" to go through the documentation exhaustively just to verify if a type error would actually occur.
 
-Overall Claude was able to resolve the bugs in all snippets with minimal input
+Bug 4 was the hardest by far but clearly not hard enough as it was resolved by Claude all the same with minimal information. While in the context of MATLAB, the bug of attempting to use progress bars in a parallel computing context is likely not very niche so being able to resolve it is not too unexpected, however what was surprising was that Claude was able to deduce the exact package used (MNPBEM) despite not being explicitly stated, in the code or prompts. It appears that Claude was able to recognise the set up code as commonly used with MNPBEM and include that context in its analysis.
 
-## Bug 1 - String slicing
-- Inferred function purpose
-## Bug 2 - Rust lifetimes
-- basic rust lifetime error
-## Bug 3 - Python module
-- Incorrect use of numpy
-- Inferred function purpose
-## Bug 4 - MATLAB multithreading function
-- able to infer use of MNPBEM package despite not being explicitly stated, in the code or prompts
+In conclusion, for quick fixes to common mistakes, AI appears to be quite effective. However, these bug snippets have been limited to under 40 lines with no additional context. Further testing would be required to determine how AI would perform on larger code bases on more novel bugs.

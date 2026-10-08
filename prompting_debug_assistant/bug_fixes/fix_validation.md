@@ -6,7 +6,7 @@
 - **Result**: Pass
 
 ## Bug 2 – bug2_fixed.rs
-**Test**: First check if the code compiles then create a world instance and call `add_homes` and assert that a home was added for each person.
+**Test**: First check if the code compiles then create a world instance and call `give_home` and assert that a home was added for each person.
 - **Input**: `World` instance with people = vec![1., -1.] and world = vec![].
 - **Expected Output**: world.places = vec![(1., 0.), (0., 1.)]
 - **Actual Output**: world.places = vec![(1., 0.), (0., 1.)]
