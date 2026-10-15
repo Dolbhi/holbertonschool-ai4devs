@@ -1,19 +1,14 @@
 # Prompt Use Cases
 ## Code Quality
-- **Function Refactoring**
+- **Refactor Function**
 	- **Goal**: Extract block into standalone function
 	- **Input**: Code block and section of code to be factorised out
 	- **Output**: Refactored code with new function
 
-- **Moving Declaration**
+- **Move Declaration**
 	- **Goal**: Move function/class declaration between files/modules/namespaces
 	- **Input**: Code base with source function/class declaration and destination location
 	- **Output**: Refactored codebase with the declaration moved and all references updated.
-
-- **Style Enforcement**
-	- **Goal**: Enforce consistent naming and formatting
-	- **Input**: Code block
-	- **Output**: Rewritten code with consistent style
 
 ## Documentation
 - **Generate Documentation**
@@ -26,11 +21,10 @@
 	- **Input**: Code block
 	- **Output**: Code with comments inserted where they would be helpful
 
-- **Commenting**
-	- **Goal**: Improve readability
-	- **Input**: Code block
-	- **Output**: Code with comments inserted where they would be helpful
-
+- **Generate Change Log**
+	- **Goal**: Generate accurate log of changes made
+	- **Input**: Files and lines changed
+	- **Output**: Change log describing changes and impacted interfaces
 ## Debugging
 - **Verify Code**
 	- **Goal**: Spot possible bugs
@@ -52,6 +46,11 @@
 	- **Goal**: Generate a test for a given feature
 	- **Input**: Code base and feature description
 	- **Output**: Code for a runnable test of the feature
+
+- **Quality Assurance**
+	- **Goal**: Evaluate the quality of some output
+	- **Input**: Original objective and requirements and output of a function or AI prompt
+	- **Output**: Quality of output relative to given objective and requirements with explanation and feedback
 
 ## Learning
 - **Feature Example**
