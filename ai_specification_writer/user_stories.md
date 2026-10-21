@@ -82,7 +82,7 @@ Acceptance Criteria:
 - Sensitive payment information is handled according to applicable security requirements.
 Priority: MVP
 
-User Story 8: Receive Ride Contributions
+### User Story 8: Receive Ride Contributions
 As a driver, I want to receive passenger contributions for completed rides so that I can recover part of my commuting expenses.
 
 Acceptance Criteria:
