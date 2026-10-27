@@ -1,6 +1,7 @@
 # Microservices Architecture
-- **Authentication Module**: Manages login and sessions.
-- **Identification Module**: Analyses user data to identify plants and generate map markers.
-- **Prediction Module**: Core logic for calculating when blooming starts.
-- **Database**: Stores all data centrally. 
-- **Notification Module**: Handles blooming events and related notifications
+- **Authentication Service**: Manages login and sessions.
+- **Identification Service**: Analyses user data to identify plants and generate map markers.
+- **Prediction Service**: Core logic for calculating when blooming starts.
+- **Notification Service**: Handles blooming events and related notifications
+- **Analytics Service**: Collects metrics.
+- **Map Service**: Handles displaying markers and information
