@@ -8,7 +8,7 @@ User-driven flower blooming tracker
 - Users can submit photos of plants for identification and tracking
 ## Users
 - Observers: want to find blooming plants and learn more about them
-- Contributors: submit photos to add new trees and plants
+- Contributors: submit photos to add new trees and plants or identify existing photos
 ## Constraints
 - Scale to 10k concurrent users
 - Mobile-first design
