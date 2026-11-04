@@ -20,7 +20,7 @@ Blooming plant tracker
 
 ## Data Rules
 - Plant IDs must be unique
-- Price must be > 0
+- Valid GPS position
 
 ## Non-Functional
 - Response time < 200ms
