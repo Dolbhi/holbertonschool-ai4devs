@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "Blooming Plant Tracker API",
     "description": "API for discovering blooming plants, contributing photographs, identifying plant species and tracking bloom predictions.",
