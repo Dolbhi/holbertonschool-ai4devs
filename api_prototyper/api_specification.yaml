@@ -1,0 +1,600 @@
+openapi: 3.1.0
+
+info:
+  title: Blooming Plant Tracker API
+  description: >
+    API for discovering blooming plants, contributing photographs,
+    identifying plant species and tracking bloom predictions.
+  version: 1.0.0
+
+servers:
+  - url: https://api.planttracker.com/v1
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Plants
+    description: Plant CRUD operations
+  - name: Photos
+    description: Plant photo contributions
+  - name: Identification
+    description: Plant identification submissions
+  - name: Bloom Predictions
+    description: Bloom prediction management
+  - name: Search
+    description: Plant discovery and search
+
+paths:
+
+  /plants:
+    post:
+      tags: [Plants]
+      summary: Add a plant
+      operationId: createPlant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantInput'
+      responses:
+        '201':
+          description: Plant successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    get:
+      tags: [Search]
+      summary: List and search plants
+      operationId: listPlants
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - name: species
+          in: query
+          schema:
+            type: string
+        - name: colour
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated plant results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /plants/{plantId}:
+    parameters:
+      - $ref: '#/components/parameters/PlantId'
+
+    get:
+      tags: [Plants]
+      summary: Get a plant
+      operationId: getPlant
+      responses:
+        '200':
+          description: Plant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plant'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Plants]
+      summary: Update plant details
+      operationId: updatePlant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantUpdate'
+      responses:
+        '200':
+          description: Plant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Plants]
+      summary: Delete a plant
+      operationId: deletePlant
+      responses:
+        '204':
+          description: Plant successfully deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /plants/{plantId}/photos:
+    parameters:
+      - $ref: '#/components/parameters/PlantId'
+
+    post:
+      tags: [Photos]
+      summary: Add a plant photo
+      operationId: addPlantPhoto
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [photo]
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                caption:
+                  type: string
+      responses:
+        '201':
+          description: Photo successfully uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /plants/{plantId}/photos/{photoId}:
+    parameters:
+      - $ref: '#/components/parameters/PlantId'
+      - name: photoId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    delete:
+      tags: [Photos]
+      summary: Remove a plant photo
+      operationId: removePlantPhoto
+      responses:
+        '204':
+          description: Photo successfully removed
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /plants/{plantId}/identities:
+    parameters:
+      - $ref: '#/components/parameters/PlantId'
+
+    post:
+      tags: [Identification]
+      summary: Submit a plant identity
+      operationId: addPlantIdentity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantIdentityInput'
+      responses:
+        '201':
+          description: Identification submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantIdentity'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /plants/{plantId}/bloom-prediction:
+    parameters:
+      - $ref: '#/components/parameters/PlantId'
+
+    patch:
+      tags: [Bloom Predictions]
+      summary: Update bloom prediction
+      operationId: updateBloomPrediction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloomPredictionInput'
+      responses:
+        '200':
+          description: Bloom prediction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloomPrediction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /plants/nearby:
+    get:
+      tags: [Search]
+      summary: Search for nearby plants
+      operationId: searchNearbyPlants
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            minimum: -90
+            maximum: 90
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            minimum: -180
+            maximum: 180
+        - name: radius
+          in: query
+          description: Search radius in metres
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100000
+            default: 5000
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Nearby plants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /plants/search/species:
+    get:
+      tags: [Search]
+      summary: Search plants by species
+      operationId: searchPlantsBySpecies
+      parameters:
+        - name: species
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Matching plants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantPage'
+
+  /plants/search/colour:
+    get:
+      tags: [Search]
+      summary: Search plants by flower colour
+      operationId: searchPlantsByColour
+      parameters:
+        - name: colour
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - red
+              - orange
+              - yellow
+              - green
+              - blue
+              - purple
+              - pink
+              - white
+              - brown
+              - black
+              - multicolour
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Matching plants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantPage'
+
+  /plants/merge:
+    post:
+      tags: [Plants]
+      summary: Merge duplicate plants
+      operationId: mergePlants
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sourcePlantId
+                - targetPlantId
+              properties:
+                sourcePlantId:
+                  type: string
+                  format: uuid
+                targetPlantId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Plants successfully merged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mergedPlant:
+                    $ref: '#/components/schemas/Plant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PlantId:
+      name: plantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+        nullable: true
+
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  schemas:
+
+    PlantInput:
+      type: object
+      required:
+        - species
+        - location
+      properties:
+        species:
+          type: string
+          minLength: 1
+        commonName:
+          type: string
+        colour:
+          type: string
+        location:
+          $ref: '#/components/schemas/GPSLocation'
+
+    PlantUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        species:
+          type: string
+          minLength: 1
+        commonName:
+          type: string
+        colour:
+          type: string
+        location:
+          $ref: '#/components/schemas/GPSLocation'
+
+    Plant:
+      allOf:
+        - $ref: '#/components/schemas/PlantInput'
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id:
+              type: string
+              format: uuid
+              readOnly: true
+            createdAt:
+              type: string
+              format: date-time
+              readOnly: true
+            photos:
+              type: array
+              items:
+                $ref: '#/components/schemas/Photo'
+            bloomPrediction:
+              $ref: '#/components/schemas/BloomPrediction'
+
+    GPSLocation:
+      type: object
+      required: [latitude, longitude]
+      properties:
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+
+    Photo:
+      type: object
+      required: [id, url, uploadedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+        caption:
+          type: string
+        uploadedAt:
+          type: string
+          format: date-time
+
+    PlantIdentityInput:
+      type: object
+      required: [species]
+      properties:
+        species:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        notes:
+          type: string
+
+    PlantIdentity:
+      allOf:
+        - $ref: '#/components/schemas/PlantIdentityInput'
+        - type: object
+          required: [id, status]
+          properties:
+            id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [pending, accepted, rejected]
+
+    BloomPredictionInput:
+      type: object
+      required: [startDate, endDate]
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    BloomPrediction:
+      allOf:
+        - $ref: '#/components/schemas/BloomPredictionInput'
+        - type: object
+          properties:
+            updatedAt:
+              type: string
+              format: date-time
+
+    PlantPage:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plant'
+        pagination:
+          type: object
+          required: [hasMore]
+          properties:
+            nextCursor:
+              type: string
+              nullable: true
+            hasMore:
+              type: boolean
+
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              reason:
+                type: string
+        requestId:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request or validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Missing or invalid JWT
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Requested resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Conflict:
+      description: Duplicate ID or conflicting operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
