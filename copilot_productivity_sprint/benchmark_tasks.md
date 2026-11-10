@@ -12,13 +12,14 @@
 **Outputs**: collision point (if any)
 **Acceptance Criteria**:
 - Correctly returns ray entry point on cuboid
-- Returns `None` if ray does not interscet
-- Correctly detects no interscetion if ray does not reach the cuboid within the given distance
+- Returns `None` if ray does not intersect
+- Correctly detects no intersection if ray does not reach the cuboid within the given distance
 - Returns the starting point if it is inside the cuboid
 
 ## Task 3 - Doubly linked list loop
 **Requirements**: Implement a doubly linked list in rust containing generic elements
 **Associated Functions**: List creation, item insertion before index, item removal at index, mutable and immutable item borrows at index
+**Outputs**: New empty list, NA, removed item, mutable or immutable borrow
 **Acceptance Criteria**:
 - Given a immutable borrow of a list item, the next and previous item in the list can be borrowed immutably
 - No infinite function call stack when dropping list
