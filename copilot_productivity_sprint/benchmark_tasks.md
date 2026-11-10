@@ -16,7 +16,7 @@
 - Correctly detects no interscetion if ray does not reach the cuboid within the given distance
 - Returns the starting point if it is inside the cuboid
 
-## Task 2 - Doubly linked list loop
+## Task 3 - Doubly linked list loop
 **Requirements**: Implement a doubly linked list in rust containing generic elements
 **Associated Functions**: List creation, item insertion before index, item removal at index, mutable and immutable item borrows at index
 **Acceptance Criteria**:
