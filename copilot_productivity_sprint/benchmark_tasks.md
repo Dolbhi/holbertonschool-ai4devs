@@ -19,6 +19,7 @@
 ## Task 3 - Doubly linked list loop
 **Requirements**: Implement a doubly linked list in rust containing generic elements
 **Associated Functions**: List creation, item insertion before index, item removal at index, mutable and immutable item borrows at index
+**Inputs**: NA, insertion index, removal index, borrow index
 **Outputs**: New empty list, NA, removed item, mutable or immutable borrow
 **Acceptance Criteria**:
 - Given a immutable borrow of a list item, the next and previous item in the list can be borrowed immutably
