@@ -2,6 +2,26 @@ make multiple user stories + features from stories
 do yourself then do ai
 do 2 personas
 
+User accounts
+- email/pwd
+Plant submission
+- 1 picture
+- plant name
+- location (GPS?)
+- blooming window
+- description
+plant details
+- details from submissions
+Temporal representation
+- bloom predictions
+- seasons
+- Bevan's hayfever warnings
+spatial representation
+- plant filtering
+Community Moderation
+- PR like reviews
+- contributor/spam integrity
+
 ## User Story x5(self) + filtered AI add-on (up to 10)
 As a [],
 I want [],
