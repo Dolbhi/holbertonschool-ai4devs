@@ -1,3 +1,5 @@
+import sys
+
 def pad_zero(word, tgt_len):
     while len(word) < tgt_len:
         word = "0" + word
@@ -30,13 +32,13 @@ def parse_timestamp(word: str):
 
     return Timestamp(hrs, mins, secs, ms)
 
-def shift_timestamps(file_name, shift_ms):
+def shift_timestamps(file_name, shift_ms, out_file):
     with open(file_name, "r") as file:
         lines = []
         for line in file.readlines():
             if line != "\n":
                 lines.append(line)
-        with open("output.srt", "w") as o_file:
+        with open(out_file, "w") as o_file:
             i = 0
             for line in lines:
                 if i % 3 == 0:
@@ -55,3 +57,5 @@ def shift_timestamps(file_name, shift_ms):
                     o_file.write(line)
                     o_file.write("\n")
                 i += 1
+
+shift_timestamps(sys.argv[0], int(sys.argv[1]), sys.argv[2])
