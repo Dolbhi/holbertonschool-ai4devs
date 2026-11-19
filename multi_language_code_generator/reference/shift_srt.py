@@ -55,6 +55,3 @@ def shift_timestamps(file_name, shift_ms):
                     o_file.write(line)
                     o_file.write("\n")
                 i += 1
-
-
-shift_timestamps("all in.srt", 100023)
