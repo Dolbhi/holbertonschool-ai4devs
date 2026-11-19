@@ -58,4 +58,5 @@ def shift_timestamps(file_name, shift_ms, out_file):
                     o_file.write("\n")
                 i += 1
 
-shift_timestamps(sys.argv[1], int(sys.argv[2]), sys.argv[3])
+if __name__ == "__main__":
+    shift_timestamps(sys.argv[1], int(sys.argv[2]), sys.argv[3])
