@@ -1,0 +1,34 @@
+name: Trello branch sync
+
+on:
+  # schedule:
+  #   - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      card_short_link:
+        description: "Trello card shortLink (8 characters). Leave empty to sync the whole ready list."
+        required: false
+        type: string
+
+permissions:
+  contents: read  # the token used by gh below needs write access, see notes
+
+concurrency:
+  group: trello-branch-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create branches and link cards
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          READY_LIST_ID: ${{ vars.READY_LIST_ID }}
+          CARD_SHORT_LINK: ${{ inputs.card_short_link }}
+          ALLOWED_REPOS_FILE: .github/trello-allowed-repos.txt
+        run: bash .github/scripts/sync-trello-branches.sh
