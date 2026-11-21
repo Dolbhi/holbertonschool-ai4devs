@@ -22,14 +22,7 @@ process_card() {
   name=$(jq -r '.name' <<<"$card")
   desc=$(jq -r '.desc // ""' <<<"$card")
 
-  repo=$(grep -oiE '^[[:space:]]*repo:[[:space:]]*[A-Za-z0-9._-]+/[A-Za-z0-9._-]+' <<<"$desc" \
-    | head -n1 | sed -E 's/^[[:space:]]*repo:[[:space:]]*//I' || true)
-  if [[ -z "$repo" ]]; then
-    echo "skip $short: no 'repo: owner/name' line"; return 0
-  fi
-  if ! grep -qxF "$repo" "$ALLOWED_REPOS_FILE"; then
-    echo "skip $short: $repo is not allowlisted"; return 0
-  fi
+  repo="${TARGET_REPO}"
 
   slug=$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]' \
     | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g' | cut -c1-40 | sed -E 's/-+$//')
