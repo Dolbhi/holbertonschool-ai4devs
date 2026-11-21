@@ -1,0 +1,3 @@
+# .github/trello-allowed-repos.txt
+acme/api
+acme/web
