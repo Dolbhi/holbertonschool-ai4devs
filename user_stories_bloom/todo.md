@@ -1,3 +1,13 @@
+## Self study
+React
+Postges
+Techstacks
+Backend network APIs
+
+Expo
+
+## Tasks
+Automated trello to have an AI create a branch based on a task, referencing mcp
 ## Project Management
 Frontend: React
 	Crystal
