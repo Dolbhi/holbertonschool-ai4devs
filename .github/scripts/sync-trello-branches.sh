@@ -72,8 +72,11 @@ process_card() {
 
     default=$(gh api "repos/$repo" --jq '.default_branch')
     base_sha=$(gh api "repos/$repo/git/ref/heads/$default" --jq '.object.sha')
-    gh api -X POST "repos/$repo/git/refs" \
-      -f "ref=refs/heads/$branch" -f "sha=$base_sha" >/dev/null
+    if ! gh api -X POST "repos/$repo/git/refs" \
+      -f "ref=refs/heads/$branch" -f "sha=$base_sha" >/dev/null; then
+      echo "::warning::failed to create branch $repo $branch"
+      continue
+    fi
     echo "created: $repo $branch"
 
     issue_template=$(mktemp)
