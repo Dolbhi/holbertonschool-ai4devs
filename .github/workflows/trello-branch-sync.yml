@@ -34,5 +34,8 @@ jobs:
           TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
           TRELLO_LABEL: "AI ready"
           CARD_SHORT_LINK: ${{ inputs.card_short_link }}
-          TARGET_REPO: ${{ github.repository }}
+          FRONTEND_LABEL: "Frontend"
+          BACKEND_LABEL: "Backend"
+          FRONTEND_REPO: "mel-aida-1st/bloom-frontend"
+          BACKEND_REPO: "mel-aida-1st/bloom-backend"
         run: bash .github/scripts/sync-trello-branches.sh
