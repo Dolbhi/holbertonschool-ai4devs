@@ -34,5 +34,5 @@ jobs:
           TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
           TRELLO_LABEL: "AI ready"
           CARD_SHORT_LINK: ${{ inputs.card_short_link }}
-          ALLOWED_REPOS_FILE: .github/trello-allowed-repos.txt
+          TARGET_REPO: ${{ github.repository }}
         run: bash .github/scripts/sync-trello-branches.sh
