@@ -6,9 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       card_short_link:
-        description: "Trello card shortLink (8 characters). Leave empty to sync the whole ready list."
+        description: "Trello card shortLink (8 characters). Leave empty to sync all cards with the label."
         required: false
         type: string
+      # label:
+      #   description: "Trello label name to sync when card_short_link is empty."
+      #   required: false
+      #   type: string
 
 permissions:
   contents: read  # the token used by gh below needs write access, see notes
@@ -28,7 +32,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
           TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
-          READY_LIST_ID: ${{ vars.READY_LIST_ID }}
+          TRELLO_LABEL: "AI ready"
           CARD_SHORT_LINK: ${{ inputs.card_short_link }}
           ALLOWED_REPOS_FILE: .github/trello-allowed-repos.txt
         run: bash .github/scripts/sync-trello-branches.sh

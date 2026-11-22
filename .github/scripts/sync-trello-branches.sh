@@ -5,13 +5,27 @@ set -euo pipefail
 API="https://api.trello.com/1"
 AUTH=(--data-urlencode "key=$TRELLO_KEY" --data-urlencode "token=$TRELLO_TOKEN")
 
-# Manual run: one card. Scheduled run: every card in the ready list.
+# Manual run: one card. Otherwise: every open card with the requested label.
 if [[ -n "${CARD_SHORT_LINK:-}" ]]; then
   cards=$(curl -fsSG "$API/cards/$CARD_SHORT_LINK" "${AUTH[@]}" \
     --data-urlencode "fields=id,name,desc,shortLink" | jq -c '[.]')
 else
-  cards=$(curl -fsSG "$API/lists/$READY_LIST_ID/cards" "${AUTH[@]}" \
-    --data-urlencode "fields=id,name,desc,shortLink")
+  label="${TRELLO_LABEL:-${CARD_LABEL:-${LABEL:-}}}"
+  if [[ -z "$label" ]]; then
+    echo "::error::CARD_SHORT_LINK or TRELLO_LABEL must be provided"
+    exit 1
+  fi
+
+  cards=$(curl -fsSG "$API/search" "${AUTH[@]}" \
+    --data-urlencode "query=label:\"$label\"" \
+    --data-urlencode "cards=open" \
+    --data-urlencode "cards_limit=1000" \
+    --data-urlencode "modelTypes=cards" \
+    --data-urlencode "card_fields=id,name,desc,shortLink,labels" |
+    jq -c --arg label "$label" '
+        (.cards // .)
+        | map(select((.labels // []) | any(.name == $label or .id == $label)))
+      ')
 fi
 
 process_card() {
