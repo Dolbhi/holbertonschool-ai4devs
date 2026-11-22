@@ -1,3 +1,10 @@
+## Monday
+- Present branch creation sys
+- Describe MCP workings
+- Assign tasks
+- For frontend, check for figma and or design tokens
+- For database, connect dev/preview database, Postgres role with limited access, connect a Postgres MCP server
+- For backend, 
 ## Self study
 React
 Postges
@@ -5,9 +12,6 @@ Techstacks
 Backend network APIs
 
 Expo
-
-## Tasks
-Automated trello to have an AI create a branch based on a task, referencing mcp
 ## Project Management
 Frontend: React
 	Crystal
