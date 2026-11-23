@@ -3,6 +3,19 @@
 set -euo pipefail
 
 API="https://api.trello.com/1"
+if [[ -z "${TRELLO_KEY:-}" || -z "${TRELLO_TOKEN:-}" ]]; then
+  echo "::error::TRELLO_KEY and TRELLO_TOKEN must be provided"
+  exit 1
+fi
+if [[ -z "${GH_TOKEN:-}" ]]; then
+  echo "::error::GH_TOKEN must be provided"
+  exit 1
+fi
+if [[ "${GH_TOKEN}" == github_pat_* ]]; then
+  echo "::error::gh agent-task requires an OAuth or compatible classic PAT; fine-grained personal access tokens are not supported"
+  exit 1
+fi
+
 AUTH=(--data-urlencode "key=$TRELLO_KEY" --data-urlencode "token=$TRELLO_TOKEN")
 
 # Manual run: one card. Otherwise: every open card with the requested label.
