@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create Copilot tasks and link cards
+      - name: Create branches and link cards
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
