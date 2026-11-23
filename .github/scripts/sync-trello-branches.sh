@@ -28,16 +28,53 @@ else
       ')
 fi
 
+# Builds the prompt sent to Copilot. Kept in one place so it's easy to tune.
+build_prompt() {
+  local name="$1" desc="$2" short="$3"
+  printf 'Task: %s\n\n' "$name"
+  printf 'Description:\n%s\n\n' "${desc:-No description provided.}"
+  printf 'Trello card: https://trello.com/c/%s\n\n' "$short"
+  printf 'Follow the conventions in AGENTS.md at the repository root. '
+  printf 'Run the validation commands listed there before opening the pull request.\n'
+}
+
+# Posts the task to Copilot for a single repo and records it on the card.
+dispatch_to_repo() {
+  local repo="$1" card_id="$2" short="$3" name="$4" desc="$5" existing="$6"
+  local marker="Copilot task: $short $repo" prompt output url base_args=()
+
+  if grep -qF "$marker" <<<"$existing"; then
+    echo "exists: $repo $short"; return 0
+  fi
+
+  prompt=$(build_prompt "$name" "$desc" "$short")
+  if [[ -n "${BASE_BRANCH:-}" ]]; then
+    base_args=(--base "$BASE_BRANCH")
+  fi
+
+  if ! output=$(gh agent-task create "$prompt" --repo "$repo" "${base_args[@]}" 2>&1); then
+    echo "::warning::failed to dispatch $repo $short: $output"
+    return 1
+  fi
+  echo "dispatched: $repo $short"
+
+  # Link to the PR if the CLI printed one, otherwise to the repo's PR list.
+  url=$(grep -oE 'https://github\.com/[^[:space:])]+' <<<"$output" | head -n1 || true)
+  url=${url:-"https://github.com/$repo/pulls"}
+
+  # Attach only on dispatch so scheduled runs don't dispatch the same card twice
+  curl -fsS -X POST "$API/cards/$card_id/attachments" "${AUTH[@]}" \
+    --data-urlencode "url=$url" \
+    --data-urlencode "name=$marker" >/dev/null
+}
+
 process_card() {
-  local card="$1" id short name desc slug repos repo default base_sha branch
+  local card="$1" id short name desc repos repo existing
 
   id=$(jq -r '.id' <<<"$card")
   short=$(jq -r '.shortLink' <<<"$card")
   name=$(jq -r '.name' <<<"$card")
   desc=$(jq -r '.desc // ""' <<<"$card")
-
-  slug=$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]' \
-    | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g' | cut -c1-40 | sed -E 's/-+$//')
 
   repos=""
   frontend_label="${FRONTEND_LABEL:-Frontend}"
@@ -63,46 +100,13 @@ process_card() {
     echo "skip $short: no 'Frontend' or 'Backend' label"; return 0
   fi
 
+  # Existing dispatch markers on this card, read once per card
+  existing=$(curl -fsSG "$API/cards/$id/attachments" "${AUTH[@]}" \
+    --data-urlencode "fields=name" | jq -r '.[].name')
+
   while IFS= read -r repo; do
-    branch="trello/$short-$slug"
-
-    if gh api "repos/$repo/git/ref/heads/$branch" >/dev/null 2>&1; then
-      echo "exists: $repo $branch"; continue
-    fi
-
-    default=$(gh api "repos/$repo" --jq '.default_branch')
-    base_sha=$(gh api "repos/$repo/git/ref/heads/$default" --jq '.object.sha')
-    if ! gh api -X POST "repos/$repo/git/refs" \
-      -f "ref=refs/heads/$branch" -f "sha=$base_sha" >/dev/null; then
-      echo "::warning::failed to create branch $repo $branch"
-      continue
-    fi
-    echo "created: $repo $branch"
-
-    issue_template=$(mktemp)
-    {
-      printf '# Agent Task\n\n'
-      printf '## Name\n\n%s\n\n' "$name"
-      printf '## Description\n\n'
-      if [[ -n "$desc" ]]; then
-        printf '%s\n\n' "$desc"
-      else
-        printf 'No description provided.\n\n'
-      fi
-      printf '## Trello Short Link\n\n%s\n' "$short"
-    } >"$issue_template"
-
-    issue_template_content=$(base64 -w0 "$issue_template")
-    rm -f "$issue_template"
-    gh api -X PUT "repos/$repo/contents/.github/ISSUE_TEMPLATE/agent-task.md" \
-      -f "message=Add agent task template for $short" \
-      -f "branch=$branch" \
-      -f "content=$issue_template_content" >/dev/null
-
-    # Attach only on creation so scheduled runs don't add duplicate attachments
-    curl -fsS -X POST "$API/cards/$id/attachments" "${AUTH[@]}" \
-      --data-urlencode "url=https://github.com/$repo/tree/$branch" \
-      --data-urlencode "name=Branch: $branch" >/dev/null
+    dispatch_to_repo "$repo" "$id" "$short" "$name" "$desc" "$existing" \
+      || echo "::warning::failed to process $repo for card $short"
   done <<<"$repos"
 }
 
