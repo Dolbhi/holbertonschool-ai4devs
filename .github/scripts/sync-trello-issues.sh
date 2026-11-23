@@ -11,11 +11,6 @@ if [[ -z "${GH_TOKEN:-}" ]]; then
   echo "::error::GH_TOKEN must be provided"
   exit 1
 fi
-if [[ "${GH_TOKEN}" == github_pat_* ]]; then
-  echo "::error::gh agent-task requires an OAuth or compatible classic PAT; fine-grained personal access tokens are not supported"
-  exit 1
-fi
-
 AUTH=(--data-urlencode "key=$TRELLO_KEY" --data-urlencode "token=$TRELLO_TOKEN")
 
 # Manual run: one card. Otherwise: every open card with the requested label.
@@ -41,41 +36,42 @@ else
       ')
 fi
 
-# Builds the prompt sent to Copilot. Kept in one place so it's easy to tune.
-build_prompt() {
-  local name="$1" desc="$2" short="$3"
-  printf 'Task: %s\n\n' "$name"
-  printf 'Description:\n%s\n\n' "${desc:-No description provided.}"
+# Builds the issue body Copilot will work from.
+build_issue_body() {
+  local desc="$1" short="$2"
+  printf '%s\n\n' "${desc:-No description provided.}"
   printf 'Trello card: https://trello.com/c/%s\n\n' "$short"
+  printf 'Please implement this task in this repository. '
   printf 'Follow the conventions in AGENTS.md at the repository root. '
   printf 'Run the validation commands listed there before opening the pull request.\n'
 }
 
-# Posts the task to Copilot for a single repo and records it on the card.
+# Creates an issue assigned to Copilot and records it on the Trello card.
 dispatch_to_repo() {
   local repo="$1" card_id="$2" short="$3" name="$4" desc="$5" existing="$6"
-  local marker="Copilot task: $short $repo" prompt output url base_args=()
+  local marker="Copilot issue: $short $repo"
+  local legacy_marker="Copilot task: $short $repo" body output url
 
-  if grep -qF "$marker" <<<"$existing"; then
+  if grep -qF "$marker" <<<"$existing" || grep -qF "$legacy_marker" <<<"$existing"; then
     echo "exists: $repo $short"; return 0
   fi
 
-  prompt=$(build_prompt "$name" "$desc" "$short")
-  if [[ -n "${BASE_BRANCH:-}" ]]; then
-    base_args=(--base "$BASE_BRANCH")
-  fi
+  body=$(build_issue_body "$desc" "$short")
 
-  if ! output=$(gh agent-task create "$prompt" --repo "$repo" "${base_args[@]}" 2>&1); then
-    echo "::warning::failed to dispatch $repo $short: $output"
+  if ! output=$(printf '%s' "$body" |
+    gh issue create --repo "$repo" --title "$name" \
+      --body-file - --assignee "@copilot" 2>&1); then
+    echo "::warning::failed to create Copilot issue in $repo for $short: $output"
     return 1
   fi
-  echo "dispatched: $repo $short"
 
-  # Link to the PR if the CLI printed one, otherwise to the repo's PR list.
   url=$(grep -oE 'https://github\.com/[^[:space:])]+' <<<"$output" | head -n1 || true)
-  url=${url:-"https://github.com/$repo/pulls"}
+  if [[ -z "$url" ]]; then
+    echo "::warning::issue created in $repo for $short, but gh did not return its URL: $output"
+    return 1
+  fi
+  echo "created Copilot issue: $repo $short $url"
 
-  # Attach only on dispatch so scheduled runs don't dispatch the same card twice
   curl -fsS -X POST "$API/cards/$card_id/attachments" "${AUTH[@]}" \
     --data-urlencode "url=$url" \
     --data-urlencode "name=$marker" >/dev/null
@@ -107,7 +103,7 @@ process_card() {
     fi
     repos="${repos}${BACKEND_REPO}"$'\n'
   fi
-  repos=$(printf '%s' "$repos" | sed '/^$/d')
+  repos=$(printf '%s' "$repos" | awk 'NF && !seen[$0]++')
 
   if [[ -z "$repos" ]]; then
     echo "skip $short: no 'Frontend' or 'Backend' label"; return 0
