@@ -33,4 +33,4 @@ jobs:
           BACKEND_LABEL: "Backend"
           FRONTEND_REPO: "mel-aida-1st/bloom-frontend"
           BACKEND_REPO: "mel-aida-1st/bloom-backend"
-        run: bash .github/scripts/sync-trello-branches.sh
+        run: bash .github/scripts/sync-trello-issues.sh
