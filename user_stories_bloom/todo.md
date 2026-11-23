@@ -12,6 +12,12 @@ Techstacks
 Backend network APIs
 
 Expo
+
+Frontend build:
+Build .apk: search up EAS
+eas build
+eas config
+Look at build type (preview)
 ## Project Management
 Frontend: React
 	Crystal
