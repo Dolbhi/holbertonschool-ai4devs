@@ -1,4 +1,4 @@
-name: Trello branch sync
+name: Trello issue sync
 
 on:
   # schedule:
@@ -6,15 +6,14 @@ on:
   workflow_dispatch:
     inputs:
       card_short_link:
-        description: "Trello card shortLink (8 characters). Leave empty to sync the whole ready list."
+        description: "Trello card shortLink (8 characters). Leave empty to sync all cards with the label."
         required: false
         type: string
-
 permissions:
-  contents: read  # the token used by gh below needs write access, see notes
+  contents: read
 
 concurrency:
-  group: trello-branch-sync
+  group: trello-issue-sync
   cancel-in-progress: false
 
 jobs:
@@ -23,12 +22,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create branches and link cards
+      - name: Create Copilot issues and link cards
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
           TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
-          READY_LIST_ID: ${{ vars.READY_LIST_ID }}
+          TRELLO_LABEL: "AI ready"
           CARD_SHORT_LINK: ${{ inputs.card_short_link }}
-          TARGET_REPO: ${{ github.repository }}
+          FRONTEND_LABEL: "Frontend"
+          BACKEND_LABEL: "Backend"
+          FRONTEND_REPO: "mel-aida-1st/bloom-frontend"
+          BACKEND_REPO: "mel-aida-1st/bloom-backend"
         run: bash .github/scripts/sync-trello-branches.sh
