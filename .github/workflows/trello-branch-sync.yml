@@ -9,10 +9,10 @@ on:
         description: "Trello card shortLink (8 characters). Leave empty to sync all cards with the label."
         required: false
         type: string
-      base_branch:
-        description: "Branch the new branch is based on. Leave empty to use the default branch"
-        required: false
-        type: string
+      # label:
+      #   description: "Trello label name to sync when card_short_link is empty."
+      #   required: false
+      #   type: string
 
 permissions:
   contents: read  # the token used by gh below needs write access, see notes
@@ -33,7 +33,6 @@ jobs:
           TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
           TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
           TRELLO_LABEL: "AI ready"
-          BASE_BRANCH: ${{ inputs.base_branch }}
           CARD_SHORT_LINK: ${{ inputs.card_short_link }}
           FRONTEND_LABEL: "Frontend"
           BACKEND_LABEL: "Backend"
