@@ -23,9 +23,39 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Get OpenCode version
+        id: opencode-version
+        shell: bash
+        run: |
+          VERSION=$(curl -fsSL --retry 3 --retry-delay 1 https://api.github.com/repos/anomalyco/opencode/releases/latest | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4) || VERSION=""
+          echo "version=${VERSION:-latest}" >> "$GITHUB_OUTPUT"
+
+      - name: Cache OpenCode
+        id: opencode-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.opencode/bin
+          key: opencode-${{ runner.os }}-${{ runner.arch }}-${{ steps.opencode-version.outputs.version }}
+
+      - name: Install OpenCode
+        if: steps.opencode-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: curl -fsSL https://opencode.ai/install | bash
+
+      - name: Add OpenCode to PATH
+        shell: bash
+        run: echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
+
       - name: Run OpenCode
-        uses: anomalyco/opencode/github@latest
+        shell: bash
+        run: opencode github run
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-        with:
-          model: opencode/deepseek-v4-flash-free
+          MODEL: opencode/deepseek-v4-flash-free
+          AGENT: ""
+          SHARE: ""
+          PROMPT: ""
+          USE_GITHUB_TOKEN: "false"
+          MENTIONS: ""
+          VARIANT: ""
+          OIDC_BASE_URL: ""
