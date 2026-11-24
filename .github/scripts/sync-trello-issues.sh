@@ -72,6 +72,12 @@ dispatch_to_repo() {
   fi
   echo "created Copilot issue: $repo $short $url"
 
+  if ! output=$(gh issue comment "$url" --repo "$repo" --body "/oc fix this" 2>&1); then
+    echo "::warning::issue created in $repo for $short, but failed to post OpenCode trigger comment: $output"
+  else
+    echo "posted OpenCode trigger comment: $repo $short"
+  fi
+
   curl -fsS -X POST "$API/cards/$card_id/attachments" "${AUTH[@]}" \
     --data-urlencode "url=$url" \
     --data-urlencode "name=$marker" >/dev/null
