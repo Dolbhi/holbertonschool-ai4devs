@@ -51,7 +51,7 @@ jobs:
         run: opencode github run
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-          MODEL: opencode/deepseek-v4-flash-free
+          MODEL: opencode/deepseek-v4.1-flash-free
           AGENT: ""
           SHARE: ""
           PROMPT: ""
