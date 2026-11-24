@@ -32,31 +32,43 @@ def parse_timestamp(word: str):
 
     return Timestamp(hrs, mins, secs, ms)
 
+def parse_blocks(text):
+    blocks = []
+    block = []
+    for line in text.splitlines():
+        if line.strip() == "":
+            if block:
+                blocks.append(block)
+                block = []
+        else:
+            block.append(line)
+    if block:
+        blocks.append(block)
+    return blocks
+
+def shift_timestamp_line(line, shift_ms):
+    splits = line.split("-->")
+    stamp_1 = parse_timestamp(splits[0].strip())
+    stamp_1.ms += shift_ms
+    stamp_2 = parse_timestamp(splits[1].strip())
+    stamp_2.ms += shift_ms
+    return f"{stamp_1} --> {stamp_2}"
+
 def shift_timestamps(file_name, shift_ms, out_file):
-    with open(file_name, "r") as file:
-        lines = []
-        for line in file.readlines():
-            if line != "\n":
-                lines.append(line)
-        with open(out_file, "w") as o_file:
-            i = 0
-            for line in lines:
-                if i % 3 == 0:
-                    # number
-                    o_file.write(line)
-                elif i % 3 == 1:
-                    # timestamp
-                    splits = line.split()
-                    stamp_1 = parse_timestamp(splits[0])
-                    stamp_1.ms += shift_ms
-                    stamp_2 = parse_timestamp(splits[2])
-                    stamp_2.ms += shift_ms
-                    o_file.write(f"{str(stamp_1)} {splits[1]} {str(stamp_2)}\n")
-                elif i % 3 == 2:
-                    # subs
-                    o_file.write(line)
-                    o_file.write("\n")
-                i += 1
+    with open(file_name, "r", encoding="utf-8") as file:
+        blocks = parse_blocks(file.read())
+
+    with open(out_file, "w", encoding="utf-8") as o_file:
+        for block in blocks:
+            o_file.write(block[0] + "\n")
+            if len(block) > 1 and "-->" in block[1]:
+                o_file.write(shift_timestamp_line(block[1], shift_ms) + "\n")
+                text_lines = block[2:]
+            else:
+                text_lines = block[1:]
+            for line in text_lines:
+                o_file.write(line + "\n")
+            o_file.write("\n")
 
 if __name__ == "__main__":
     shift_timestamps(sys.argv[1], int(sys.argv[2]), sys.argv[3])
